@@ -34,12 +34,12 @@ var (
 
 // Signature is a type representing a Schnorr signature.
 type Signature struct {
-	r ec.FieldVal
-	s ec.ModNScalar
+	r btcec.FieldVal
+	s btcec.ModNScalar
 }
 
 // NewSignature instantiates a new signature given some r and s values.
-func NewSignature(r *ec.FieldVal, s *ec.ModNScalar) *Signature {
+func NewSignature(r *btcec.FieldVal, s *btcec.ModNScalar) *Signature {
 	var sig Signature
 	sig.r.Set(r).Normalize()
 	sig.s.Set(s)
@@ -82,12 +82,12 @@ func ParseSignature(sig []byte) (*Signature, error) {
 	// additional restrictions to ensure r is in the range [0, p-1], and s is in
 	// the range [0, n-1] since valid Schnorr signatures are required to be in
 	// that range per spec.
-	var r ec.FieldVal
+	var r btcec.FieldVal
 	if overflow := r.SetByteSlice(sig[0:32]); overflow {
 		str := "invalid signature: r >= field prime"
 		return nil, signatureError(ErrSigRTooBig, str)
 	}
-	var s ec.ModNScalar
+	var s btcec.ModNScalar
 	s.SetByteSlice(sig[32:64])
 	// Return the signature.
 	return NewSignature(&r, &s), nil
@@ -166,7 +166,7 @@ func schnorrVerify(sig *Signature, hash []byte, pubKeyBytes []byte) error {
 	commitment := chainhash.TaggedHash(
 		chainhash.TagBIP0340Challenge, rBytes[:], pBytes, hash,
 	)
-	var e ec.ModNScalar
+	var e btcec.ModNScalar
 	e.SetBytes((*[32]byte)(commitment))
 	// Negate e here so we can use AddNonConst below to subtract the s*G
 	// point from e*P.
@@ -174,11 +174,11 @@ func schnorrVerify(sig *Signature, hash []byte, pubKeyBytes []byte) error {
 	// Step 6.
 	//
 	// R = s*G - e*P
-	var P, R, sG, eP ec.JacobianPoint
+	var P, R, sG, eP btcec.JacobianPoint
 	pubKey.AsJacobian(&P)
-	ec.ScalarBaseMultNonConst(&sig.s, &sG)
-	ec.ScalarMultNonConst(&e, &P, &eP)
-	ec.AddNonConst(&sG, &eP, &R)
+	btcec.ScalarBaseMultNonConst(&sig.s, &sG)
+	btcec.ScalarMultNonConst(&e, &P, &eP)
+	btcec.AddNonConst(&sG, &eP, &R)
 	// Step 7.
 	//
 	// Fail if R is the point at infinity
@@ -213,7 +213,7 @@ func schnorrVerify(sig *Signature, hash []byte, pubKeyBytes []byte) error {
 
 // Verify returns whether or not the signature is valid for the provided hash
 // and secp256k1 public key.
-func (sig *Signature) Verify(hash []byte, pubKey *ec.PublicKey) bool {
+func (sig *Signature) Verify(hash []byte, pubKey *btcec.PublicKey) bool {
 	pubkeyBytes := SerializePubKey(pubKey)
 	return schnorrVerify(sig, hash, pubkeyBytes) == nil
 }
@@ -233,7 +233,7 @@ func zeroArray(a *[scalarSize]byte) {
 // WARNING: The hash MUST be 32 bytes and both the nonce and secret keys must
 // NOT be 0.  Since this is an internal use function, these preconditions MUST
 // be satisified by the caller.
-func schnorrSign(privKey, nonce *ec.ModNScalar, pubKey *ec.PublicKey,
+func schnorrSign(privKey, nonce *btcec.ModNScalar, pubKey *btcec.PublicKey,
 	hash []byte, opts *signOptions) (*Signature, error) {
 
 	// The algorithm for producing a BIP-340 signature is described in
@@ -273,9 +273,9 @@ func schnorrSign(privKey, nonce *ec.ModNScalar, pubKey *ec.PublicKey,
 	// Step 10.
 	//
 	// R = kG
-	var R ec.JacobianPoint
+	var R btcec.JacobianPoint
 	k := *nonce
-	ec.ScalarBaseMultNonConst(&k, &R)
+	btcec.ScalarBaseMultNonConst(&k, &R)
 	// Step 11.
 	//
 	// Negate nonce k if R.y is odd (R.y is the y coordinate of the point R)
@@ -295,7 +295,7 @@ func schnorrSign(privKey, nonce *ec.ModNScalar, pubKey *ec.PublicKey,
 	commitment := chainhash.TaggedHash(
 		chainhash.TagBIP0340Challenge, rBytes[:], pBytes, hash,
 	)
-	var e ec.ModNScalar
+	var e btcec.ModNScalar
 	if overflow := e.SetBytes((*[32]byte)(commitment)); overflow != 0 {
 		k.Zero()
 		str := "hash of (r || P || m) too big"
@@ -304,7 +304,7 @@ func schnorrSign(privKey, nonce *ec.ModNScalar, pubKey *ec.PublicKey,
 	// Step 13.
 	//
 	// s = k + e*d mod n
-	s := new(ec.ModNScalar).Mul2(&e, privKey).Add(&k)
+	s := new(btcec.ModNScalar).Mul2(&e, privKey).Add(&k)
 	k.Zero()
 	sig := NewSignature(r, s)
 	// Step 14.
@@ -365,7 +365,7 @@ func CustomNonce(auxData [32]byte) SignOption {
 // which can expose the signer to constant time attacks.  As a result, this
 // function should not be used in situations where there is the possibility of
 // someone having EM field/cache/etc access.
-func Sign(privKey *ec.SecretKey, hash []byte,
+func Sign(privKey *btcec.SecretKey, hash []byte,
 	signOpts ...SignOption) (*Signature, error) {
 	// First, parse the set of optional signing options.
 	opts := defaultSignOptions()
@@ -406,7 +406,7 @@ func Sign(privKey *ec.SecretKey, hash []byte,
 	// Step 1.
 	//
 	// d' = int(d)
-	var privKeyScalar ec.ModNScalar
+	var privKeyScalar btcec.ModNScalar
 	privKeyScalar.Set(&privKey.Key)
 	//
 	// // Step 2.
@@ -462,7 +462,7 @@ func Sign(privKey *ec.SecretKey, hash []byte,
 		// Step 8.
 		//
 		// k'= int(rand) mod n
-		var kPrime ec.ModNScalar
+		var kPrime btcec.ModNScalar
 		kPrime.SetBytes((*[32]byte)(rand))
 		// Step 9.
 		//
@@ -488,7 +488,7 @@ func Sign(privKey *ec.SecretKey, hash []byte,
 		// Use RFC6979 to generate a deterministic nonce k in [1, n-1]
 		// parameterized by the secret key, message being signed, extra data
 		// that identifies the scheme, and an iteration count
-		k = ec.NonceRFC6979(
+		k = btcec.NonceRFC6979(
 			privKeyBytes[:], hash, rfc6979ExtraDataV0[:], nil, iteration,
 		)
 		// Steps 10-15.

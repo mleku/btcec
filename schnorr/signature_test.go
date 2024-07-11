@@ -204,7 +204,7 @@ func TestSchnorrSign(t *testing.T) {
 			continue
 		}
 		d := decodeHex(test.secretKey)
-		privKey, _ := ec.SecKeyFromBytes(d)
+		privKey, _ := btcec.SecKeyFromBytes(d)
 		var auxBytes [32]byte
 		aux := decodeHex(test.auxRand)
 		copy(auxBytes[:], aux)
@@ -282,7 +282,7 @@ func TestSchnorrSignNoMutate(t *testing.T) {
 	// a signature from that w/o modifying the underlying secret key.
 	f := func(privBytes, msg [32]byte) bool {
 		privBytesCopy := privBytes
-		privKey, _ := ec.SecKeyFromBytes(privBytesCopy[:])
+		privKey, _ := btcec.SecKeyFromBytes(privBytesCopy[:])
 		// Generate a signature for secret key with our message.
 		_, err := Sign(privKey, msg[:])
 		if err != nil {
@@ -291,7 +291,7 @@ func TestSchnorrSignNoMutate(t *testing.T) {
 		}
 		// We should be able to re-derive the secret key from raw
 		// bytes and have that match up again.
-		privKeyCopy, _ := ec.SecKeyFromBytes(privBytes[:])
+		privKeyCopy, _ := btcec.SecKeyFromBytes(privBytes[:])
 		if *privKey != *privKeyCopy {
 			t.Logf("secret doesn't match: expected %v, got %v",
 				spew.Sdump(privKeyCopy), spew.Sdump(privKey))

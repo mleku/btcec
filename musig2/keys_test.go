@@ -39,16 +39,16 @@ func TestMusig2KeySort(t *testing.T) {
 	require.NoError(t, err)
 	var testCase keySortTestVector
 	require.NoError(t, json.Unmarshal(testVectorBytes, &testCase))
-	keys := make([]*ec.PublicKey, len(testCase.PubKeys))
+	keys := make([]*btcec.PublicKey, len(testCase.PubKeys))
 	for i, keyStr := range testCase.PubKeys {
-		pubKey, err := ec.ParsePubKey(mustParseHex(keyStr))
+		pubKey, err := btcec.ParsePubKey(mustParseHex(keyStr))
 		require.NoError(t, err)
 		keys[i] = pubKey
 	}
 	sortedKeys := sortKeys(keys)
-	expectedKeys := make([]*ec.PublicKey, len(testCase.PubKeys))
+	expectedKeys := make([]*btcec.PublicKey, len(testCase.PubKeys))
 	for i, keyStr := range testCase.SortedKeys {
-		pubKey, err := ec.ParsePubKey(mustParseHex(keyStr))
+		pubKey, err := btcec.ParsePubKey(mustParseHex(keyStr))
 		require.NoError(t, err)
 		expectedKeys[i] = pubKey
 	}
@@ -81,12 +81,12 @@ type keyAggTestVectors struct {
 }
 
 func keysFromIndices(t *testing.T, indices []int,
-	pubKeys []string) ([]*ec.PublicKey, error) {
+	pubKeys []string) ([]*btcec.PublicKey, error) {
 	t.Helper()
-	inputKeys := make([]*ec.PublicKey, len(indices))
+	inputKeys := make([]*btcec.PublicKey, len(indices))
 	for i, keyIdx := range indices {
 		var err error
-		inputKeys[i], err = ec.ParsePubKey(
+		inputKeys[i], err = btcec.ParsePubKey(
 			mustParseHex(pubKeys[keyIdx]),
 		)
 		if err != nil {
@@ -269,7 +269,7 @@ func TestMuSig2TweakTestVectors(t *testing.T) {
 	require.NoError(t, err)
 	var testCases keyTweakVector
 	require.NoError(t, json.Unmarshal(testVectorBytes, &testCases))
-	privKey, _ := ec.SecKeyFromBytes(mustParseHex(testCases.SecKey))
+	privKey, _ := btcec.SecKeyFromBytes(mustParseHex(testCases.SecKey))
 	var msg [32]byte
 	copy(msg[:], mustParseHex(testCases.Msg))
 	var secNonce [SecNonceSize]byte

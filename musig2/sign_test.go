@@ -80,7 +80,7 @@ func TestMusig2SignVerify(t *testing.T) {
 	require.NoError(t, err)
 	var testCases signVerifyTestVectors
 	require.NoError(t, json.Unmarshal(testVectorBytes, &testCases))
-	privKey, _ := ec.SecKeyFromBytes(mustParseHex(testCases.SecKey))
+	privKey, _ := btcec.SecKeyFromBytes(mustParseHex(testCases.SecKey))
 	for i, testCase := range testCases.ValidCases {
 		testCase := testCase
 		testName := fmt.Sprintf("valid_case_%v", i)
@@ -291,7 +291,7 @@ func TestMusig2SignCombine(t *testing.T) {
 				combinedNonce, combinedKey.FinalKey, msg,
 			)
 			finalNonceJ.ToAffine()
-			finalNonce := ec.NewPublicKey(
+			finalNonce := btcec.NewPublicKey(
 				&finalNonceJ.X, &finalNonceJ.Y,
 			)
 			combinedSig := CombineSigs(

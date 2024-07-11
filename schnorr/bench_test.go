@@ -31,12 +31,12 @@ func hexToBytes(s string) []byte {
 // panic if there is an error.  This is only provided for the hard-coded
 // constants so errors in the source code can be detected. It will only (and
 // must only) be called with hard-coded values.
-func hexToModNScalar(s string) *ec.ModNScalar {
+func hexToModNScalar(s string) *btcec.ModNScalar {
 	b, err := hex.Dec(s)
 	if err != nil {
 		panic("invalid hex in source file: " + s)
 	}
-	var scalar ec.ModNScalar
+	var scalar btcec.ModNScalar
 	if overflow := scalar.SetByteSlice(b); overflow {
 		panic("hex in source file overflows mod N scalar: " + s)
 	}
@@ -47,12 +47,12 @@ func hexToModNScalar(s string) *ec.ModNScalar {
 // if there is an error.  This is only provided for the hard-coded constants so
 // errors in the source code can be detected. It will only (and must only) be
 // called with hard-coded values.
-func hexToFieldVal(s string) *ec.FieldVal {
+func hexToFieldVal(s string) *btcec.FieldVal {
 	b, err := hex.Dec(s)
 	if err != nil {
 		panic("invalid hex in source file: " + s)
 	}
-	var f ec.FieldVal
+	var f btcec.FieldVal
 	if overflow := f.SetByteSlice(b); overflow {
 		panic("hex in source file overflows mod P: " + s)
 	}

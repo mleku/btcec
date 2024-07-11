@@ -31,4 +31,4 @@
 !*.bin
 # ...even if they are in subdirectories
 !*/
-/.idea/
+.idea

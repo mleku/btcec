@@ -26,12 +26,12 @@ func hexToBytes(s string) []byte {
 	return b
 }
 
-func hexToModNScalar(s string) *ec.ModNScalar {
+func hexToModNScalar(s string) *btcec.ModNScalar {
 	b, err := hex.Dec(s)
 	if err != nil {
 		panic("invalid hex in source file: " + s)
 	}
-	var scalar ec.ModNScalar
+	var scalar btcec.ModNScalar
 	if overflow := scalar.SetByteSlice(b); overflow {
 		panic("hex in source file overflows mod N scalar: " + s)
 	}
@@ -39,7 +39,7 @@ func hexToModNScalar(s string) *ec.ModNScalar {
 }
 
 func genSigner(t *testing.B) signer {
-	privKey, err := ec.NewSecretKey()
+	privKey, err := btcec.NewSecretKey()
 	if err != nil {
 		t.Fatalf("unable to gen priv key: %v", err)
 	}
@@ -187,7 +187,7 @@ func BenchmarkCombineSigs(b *testing.B) {
 		}
 		var msg [32]byte
 		copy(msg[:], testMsg[:])
-		var finalNonce *ec.PublicKey
+		var finalNonce *btcec.PublicKey
 		for i := range signers {
 			signer := signers[i]
 			partialSig, err := Sign(
@@ -237,7 +237,7 @@ func BenchmarkAggregateNonces(b *testing.B) {
 	}
 }
 
-var testKey *ec.PublicKey
+var testKey *btcec.PublicKey
 
 // BenchmarkAggregateKeys benchmarks how long it takes to aggregate public
 // keys.

@@ -30,7 +30,7 @@ var (
 
 // sortableKeys defines a type of slice of public keys that implements the sort
 // interface for BIP 340 keys.
-type sortableKeys []*ec.PublicKey
+type sortableKeys []*btcec.PublicKey
 
 // Less reports whether the element with index i must sort before the element
 // with index j.
@@ -50,7 +50,7 @@ func (s sortableKeys) Len() int { return len(s) }
 // sortKeys takes a set of public keys and returns a new slice that is a copy
 // of the keys sorted in lexicographical order bytes on the x-only pubkey
 // serialization.
-func sortKeys(keys []*ec.PublicKey) []*ec.PublicKey {
+func sortKeys(keys []*btcec.PublicKey) []*btcec.PublicKey {
 	keySet := sortableKeys(keys)
 	if sort.IsSorted(keySet) {
 		return keys
@@ -63,7 +63,7 @@ func sortKeys(keys []*ec.PublicKey) []*ec.PublicKey {
 // keys passed as input. This is used to compute the aggregation coefficient
 // for each key. The final computation is:
 //   - H(tag=KeyAgg list, pk1 || pk2..)
-func keyHashFingerprint(keys []*ec.PublicKey, sort bool) []byte {
+func keyHashFingerprint(keys []*btcec.PublicKey, sort bool) []byte {
 	if sort {
 		keys = sortKeys(keys)
 	}
@@ -80,18 +80,18 @@ func keyHashFingerprint(keys []*ec.PublicKey, sort bool) []byte {
 
 // keyBytesEqual returns true if two keys are the same based on the compressed
 // serialization of each key.
-func keyBytesEqual(a, b *ec.PublicKey) bool {
+func keyBytesEqual(a, b *btcec.PublicKey) bool {
 	return equals(a.SerializeCompressed(), b.SerializeCompressed())
 }
 
 // aggregationCoefficient computes the key aggregation coefficient for the
 // specified target key. The coefficient is computed as:
 //   - H(tag=KeyAgg coefficient, keyHashFingerprint(pks) || pk)
-func aggregationCoefficient(keySet []*ec.PublicKey,
-	targetKey *ec.PublicKey, keysHash []byte,
-	secondKeyIdx int) *ec.ModNScalar {
+func aggregationCoefficient(keySet []*btcec.PublicKey,
+	targetKey *btcec.PublicKey, keysHash []byte,
+	secondKeyIdx int) *btcec.ModNScalar {
 
-	var mu ec.ModNScalar
+	var mu btcec.ModNScalar
 	// If this is the second key, then this coefficient is just one.
 	if secondKeyIdx != -1 && keyBytesEqual(keySet[secondKeyIdx], targetKey) {
 		return mu.SetInt(1)
@@ -109,7 +109,7 @@ func aggregationCoefficient(keySet []*ec.PublicKey,
 
 // secondUniqueKeyIndex returns the index of the second unique key. If all keys
 // are the same, then a value of -1 is returned.
-func secondUniqueKeyIndex(keySet []*ec.PublicKey, sort bool) int {
+func secondUniqueKeyIndex(keySet []*btcec.PublicKey, sort bool) int {
 	if sort {
 		keySet = sortKeys(keySet)
 	}
@@ -223,9 +223,9 @@ func defaultKeyAggOptions() *keyAggOption { return &keyAggOption{} }
 // point has an even y coordinate.
 //
 // TODO(roasbeef): double check, can just check the y coord even not jacobian?
-func hasEvenY(pJ ec.JacobianPoint) bool {
+func hasEvenY(pJ btcec.JacobianPoint) bool {
 	pJ.ToAffine()
-	p := ec.NewPublicKey(&pJ.X, &pJ.Y)
+	p := btcec.NewPublicKey(&pJ.X, &pJ.Y)
 	keyBytes := p.SerializeCompressed()
 	return keyBytes[0] == secp256k1.PubKeyFormatCompressedEven
 }
@@ -235,16 +235,16 @@ func hasEvenY(pJ ec.JacobianPoint) bool {
 // includes the accumulate ration of the parity factor and the tweak multiplied
 // by the parity factor. The xOnly bool specifies if this is to be an x-only
 // tweak or not.
-func tweakKey(keyJ ec.JacobianPoint, parityAcc ec.ModNScalar,
+func tweakKey(keyJ btcec.JacobianPoint, parityAcc btcec.ModNScalar,
 	tweak [32]byte,
-	tweakAcc ec.ModNScalar,
-	xOnly bool) (ec.JacobianPoint, ec.ModNScalar, ec.ModNScalar,
+	tweakAcc btcec.ModNScalar,
+	xOnly bool) (btcec.JacobianPoint, btcec.ModNScalar, btcec.ModNScalar,
 	error) {
 
 	// First we'll compute the new parity factor for this key. If the key has
 	// an odd y coordinate (not even), then we'll need to negate it (multiply
 	// by -1 mod n, in this case).
-	var parityFactor ec.ModNScalar
+	var parityFactor btcec.ModNScalar
 	if xOnly && !hasEvenY(keyJ) {
 		parityFactor.SetInt(1).Negate()
 	} else {
@@ -253,7 +253,7 @@ func tweakKey(keyJ ec.JacobianPoint, parityAcc ec.ModNScalar,
 
 	// Next, map the tweak into a mod n integer so we can use it for
 	// manipulations below.
-	tweakInt := new(ec.ModNScalar)
+	tweakInt := new(btcec.ModNScalar)
 	overflows := tweakInt.SetBytes(&tweak)
 	if overflows == 1 {
 		return keyJ, parityAcc, tweakAcc, ErrTweakedKeyOverflows
@@ -263,13 +263,13 @@ func tweakKey(keyJ ec.JacobianPoint, parityAcc ec.ModNScalar,
 	// follow.
 	//
 	// First compute t*G:
-	var tweakedGenerator ec.JacobianPoint
-	ec.ScalarBaseMultNonConst(tweakInt, &tweakedGenerator)
+	var tweakedGenerator btcec.JacobianPoint
+	btcec.ScalarBaseMultNonConst(tweakInt, &tweakedGenerator)
 	// Next compute g*Q:
-	ec.ScalarMultNonConst(&parityFactor, &keyJ, &keyJ)
+	btcec.ScalarMultNonConst(&parityFactor, &keyJ, &keyJ)
 	// Finally add both of them together to get our final
 	// tweaked point.
-	ec.AddNonConst(&tweakedGenerator, &keyJ, &keyJ)
+	btcec.AddNonConst(&tweakedGenerator, &keyJ, &keyJ)
 	// As a sanity check, make sure that we didn't just end up with the
 	// point at infinity.
 	if keyJ == infinityPoint {
@@ -287,11 +287,11 @@ func tweakKey(keyJ ec.JacobianPoint, parityAcc ec.ModNScalar,
 type AggregateKey struct {
 	// FinalKey is the final aggregated key which may include one or more
 	// tweaks applied to it.
-	FinalKey *ec.PublicKey
+	FinalKey *btcec.PublicKey
 	// PreTweakedKey is the aggregated *before* any tweaks have been
 	// applied.  This should be used as the internal key in taproot
 	// contexts.
-	PreTweakedKey *ec.PublicKey
+	PreTweakedKey *btcec.PublicKey
 }
 
 // AggregateKeys takes a list of possibly unsorted keys and returns a single
@@ -299,9 +299,9 @@ type AggregateKey struct {
 // value can be passed for keyHash, which causes this function to re-derive it.
 // In addition to the combined public key, the parity accumulator and the tweak
 // accumulator are returned as well.
-func AggregateKeys(keys []*ec.PublicKey, sort bool,
+func AggregateKeys(keys []*btcec.PublicKey, sort bool,
 	keyOpts ...KeyAggOption) (
-	*AggregateKey, *ec.ModNScalar, *ec.ModNScalar, error) {
+	*AggregateKey, *btcec.ModNScalar, *btcec.ModNScalar, error) {
 	// First, parse the set of optional signing options.
 	opts := defaultKeyAggOptions()
 	for _, option := range keyOpts {
@@ -327,29 +327,29 @@ func AggregateKeys(keys []*ec.PublicKey, sort bool,
 	// where a_i is the aggregation coefficient for that key, and P_i is
 	// the key itself, then accumulate that (addition) into the main final
 	// key: P = P_1 + P_2 ... P_N.
-	var finalKeyJ ec.JacobianPoint
+	var finalKeyJ btcec.JacobianPoint
 	for _, key := range keys {
 		// Port the key over to Jacobian coordinates as we need it in
 		// this format for the routines below.
-		var keyJ ec.JacobianPoint
+		var keyJ btcec.JacobianPoint
 		key.AsJacobian(&keyJ)
 		// Compute the aggregation coefficient for the key, then
 		// multiply it by the key itself: P_i' = a_i*P_i.
-		var tweakedKeyJ ec.JacobianPoint
+		var tweakedKeyJ btcec.JacobianPoint
 		a := aggregationCoefficient(
 			keys, key, opts.keyHash, *opts.uniqueKeyIndex,
 		)
-		ec.ScalarMultNonConst(a, &keyJ, &tweakedKeyJ)
+		btcec.ScalarMultNonConst(a, &keyJ, &tweakedKeyJ)
 		// Finally accumulate this into the final key in an incremental
 		// fashion.
-		ec.AddNonConst(&finalKeyJ, &tweakedKeyJ, &finalKeyJ)
+		btcec.AddNonConst(&finalKeyJ, &tweakedKeyJ, &finalKeyJ)
 	}
 
 	// We'll copy over the key at this point, since this represents the
 	// aggregated key before any tweaks have been applied. This'll be used
 	// as the internal key for script path proofs.
 	finalKeyJ.ToAffine()
-	combinedKey := ec.NewPublicKey(&finalKeyJ.X, &finalKeyJ.Y)
+	combinedKey := btcec.NewPublicKey(&finalKeyJ.X, &finalKeyJ.Y)
 	// At this point, if this is a taproot tweak, then we'll modify the
 	// base tweak value to use the BIP 341 tweak value.
 	if opts.taprootTweak {
@@ -379,8 +379,8 @@ func AggregateKeys(keys []*ec.PublicKey, sort bool,
 
 	var (
 		err       error
-		tweakAcc  ec.ModNScalar
-		parityAcc ec.ModNScalar
+		tweakAcc  btcec.ModNScalar
+		parityAcc btcec.ModNScalar
 	)
 	parityAcc.SetInt(1)
 	// In this case we have a set of tweaks, so we'll incrementally apply
@@ -396,7 +396,7 @@ func AggregateKeys(keys []*ec.PublicKey, sort bool,
 		}
 	}
 	finalKeyJ.ToAffine()
-	finalKey := ec.NewPublicKey(&finalKeyJ.X, &finalKeyJ.Y)
+	finalKey := btcec.NewPublicKey(&finalKeyJ.X, &finalKeyJ.Y)
 	return &AggregateKey{
 		PreTweakedKey: combinedKey,
 		FinalKey:      finalKey,

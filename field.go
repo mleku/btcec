@@ -1,4 +1,4 @@
-package ec
+package btcec
 
 import "github.com/mleku/btcec/secp256k1"
 

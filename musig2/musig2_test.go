@@ -26,16 +26,16 @@ func mustParseHex(str string) []byte {
 }
 
 type signer struct {
-	privKey    *ec.SecretKey
-	pubKey     *ec.PublicKey
+	privKey    *btcec.SecretKey
+	pubKey     *btcec.PublicKey
 	nonces     *Nonces
 	partialSig *PartialSignature
 }
 
 type signerSet []signer
 
-func (s signerSet) keys() []*ec.PublicKey {
-	keys := make([]*ec.PublicKey, len(s))
+func (s signerSet) keys() []*btcec.PublicKey {
+	keys := make([]*btcec.PublicKey, len(s))
 	for i := 0; i < len(s); i++ {
 		keys[i] = s[i].pubKey
 	}
@@ -58,7 +58,7 @@ func (s signerSet) pubNonces() [][PubNonceSize]byte {
 	return nonces
 }
 
-func (s signerSet) combinedKey() *ec.PublicKey {
+func (s signerSet) combinedKey() *btcec.PublicKey {
 	uniqueKeyIndex := secondUniqueKeyIndex(s.keys(), false)
 	key, _, _, _ := AggregateKeys(
 		s.keys(), false, WithUniqueKeyIndex(uniqueKeyIndex),
@@ -72,10 +72,10 @@ func testMultiPartySign(t *testing.T, taprootTweak []byte,
 
 	const numSigners = 100
 	// First generate the set of signers along with their public keys.
-	signerKeys := make([]*ec.SecretKey, numSigners)
-	signSet := make([]*ec.PublicKey, numSigners)
+	signerKeys := make([]*btcec.SecretKey, numSigners)
+	signSet := make([]*btcec.PublicKey, numSigners)
 	for i := 0; i < numSigners; i++ {
-		privKey, err := ec.NewSecretKey()
+		privKey, err := btcec.NewSecretKey()
 		if err != nil {
 			t.Fatalf("unable to gen priv key: %v", err)
 		}
@@ -83,7 +83,7 @@ func testMultiPartySign(t *testing.T, taprootTweak []byte,
 		signerKeys[i] = privKey
 		signSet[i] = pubKey
 	}
-	var combinedKey *ec.PublicKey
+	var combinedKey *btcec.PublicKey
 	var ctxOpts []ContextOption
 	switch {
 	case len(taprootTweak) == 0:
@@ -229,11 +229,11 @@ func TestMuSigMultiParty(t *testing.T) {
 // exchagned before all signers are known, the context API works as expected.
 func TestMuSigEarlyNonce(t *testing.T) {
 	t.Parallel()
-	privKey1, err := ec.NewSecretKey()
+	privKey1, err := btcec.NewSecretKey()
 	if err != nil {
 		t.Fatalf("unable to gen priv key: %v", err)
 	}
-	privKey2, err := ec.NewSecretKey()
+	privKey2, err := btcec.NewSecretKey()
 	if err != nil {
 		t.Fatalf("unable to gen priv key: %v", err)
 	}
@@ -243,7 +243,7 @@ func TestMuSigEarlyNonce(t *testing.T) {
 	if !errors.Is(err, ErrSignersNotSpecified) {
 		t.Fatalf("unexpected ctx error: %v", err)
 	}
-	signers := []*ec.PublicKey{privKey1.PubKey(), privKey2.PubKey()}
+	signers := []*btcec.PublicKey{privKey1.PubKey(), privKey2.PubKey()}
 	numSigners := len(signers)
 	ctx1, err := NewContext(
 		privKey1, true, WithNumSigners(numSigners), WithEarlyNonceGen(),

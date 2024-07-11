@@ -56,24 +56,24 @@ type Nonces struct {
 // secNonceToPubNonce takes our two secrete nonces, and produces their two
 // corresponding EC points, serialized in compressed format.
 func secNonceToPubNonce(secNonce [SecNonceSize]byte) [PubNonceSize]byte {
-	var k1Mod, k2Mod ec.ModNScalar
-	k1Mod.SetByteSlice(secNonce[:ec.SecKeyBytesLen])
-	k2Mod.SetByteSlice(secNonce[ec.SecKeyBytesLen:])
-	var r1, r2 ec.JacobianPoint
-	ec.ScalarBaseMultNonConst(&k1Mod, &r1)
-	ec.ScalarBaseMultNonConst(&k2Mod, &r2)
+	var k1Mod, k2Mod btcec.ModNScalar
+	k1Mod.SetByteSlice(secNonce[:btcec.SecKeyBytesLen])
+	k2Mod.SetByteSlice(secNonce[btcec.SecKeyBytesLen:])
+	var r1, r2 btcec.JacobianPoint
+	btcec.ScalarBaseMultNonConst(&k1Mod, &r1)
+	btcec.ScalarBaseMultNonConst(&k2Mod, &r2)
 	// Next, we'll convert the key in jacobian format to a normal public
 	// key expressed in affine coordinates.
 	r1.ToAffine()
 	r2.ToAffine()
-	r1Pub := ec.NewPublicKey(&r1.X, &r1.Y)
-	r2Pub := ec.NewPublicKey(&r2.X, &r2.Y)
+	r1Pub := btcec.NewPublicKey(&r1.X, &r1.Y)
+	r2Pub := btcec.NewPublicKey(&r2.X, &r2.Y)
 	var pubNonce [PubNonceSize]byte
 	// The public nonces are serialized as: R1 || R2, where both keys are
 	// serialized in compressed format.
 	copy(pubNonce[:], r1Pub.SerializeCompressed())
 	copy(
-		pubNonce[ec.PubKeyBytesLenCompressed:],
+		pubNonce[btcec.PubKeyBytesLenCompressed:],
 		r2Pub.SerializeCompressed(),
 	)
 	return pubNonce
@@ -133,7 +133,7 @@ func WithCustomRand(r io.Reader) NonceGenOption {
 
 // WithPublicKey is the mandatory public key that will be mixed into the nonce
 // generation.
-func WithPublicKey(pubKey *ec.PublicKey) NonceGenOption {
+func WithPublicKey(pubKey *btcec.PublicKey) NonceGenOption {
 	return func(o *nonceGenOpts) {
 		o.publicKey = pubKey.SerializeCompressed()
 	}
@@ -141,7 +141,7 @@ func WithPublicKey(pubKey *ec.PublicKey) NonceGenOption {
 
 // WithNonceSecretKeyAux allows a caller to optionally specify a secret key
 // that should be used to augment the randomness used to generate the nonces.
-func WithNonceSecretKeyAux(secKey *ec.SecretKey) NonceGenOption {
+func WithNonceSecretKeyAux(secKey *btcec.SecretKey) NonceGenOption {
 	return func(o *nonceGenOpts) { o.secretKey = secKey.Serialize() }
 }
 
@@ -150,7 +150,7 @@ var WithNoncePrivateKeyAux = WithNonceSecretKeyAux
 // WithNonceCombinedKeyAux allows a caller to optionally specify the combined
 // key used in this signing session to further augment the randomness used to
 // generate nonces.
-func WithNonceCombinedKeyAux(combinedKey *ec.PublicKey) NonceGenOption {
+func WithNonceCombinedKeyAux(combinedKey *btcec.PublicKey) NonceGenOption {
 	return func(o *nonceGenOpts) {
 		o.combinedKey = schnorr.SerializePubKey(combinedKey)
 	}
@@ -322,15 +322,15 @@ func GenNonces(options ...NonceGenOption) (*Nonces, error) {
 	if err != nil {
 		return nil, err
 	}
-	var k1Mod, k2Mod ec.ModNScalar
+	var k1Mod, k2Mod btcec.ModNScalar
 	k1Mod.SetBytes((*[32]byte)(k1))
 	k2Mod.SetBytes((*[32]byte)(k2))
 	// The secret nonces are serialized as the concatenation of the two 32
 	// byte secret nonce values and the pubkey.
 	var nonces Nonces
 	k1Mod.PutBytesUnchecked(nonces.SecNonce[:])
-	k2Mod.PutBytesUnchecked(nonces.SecNonce[ec.SecKeyBytesLen:])
-	copy(nonces.SecNonce[ec.SecKeyBytesLen*2:], opts.publicKey)
+	k2Mod.PutBytesUnchecked(nonces.SecNonce[btcec.SecKeyBytesLen:])
+	copy(nonces.SecNonce[btcec.SecKeyBytesLen*2:], opts.publicKey)
 	// Next, we'll generate R_1 = k_1*G and R_2 = k_2*G. Along the way we
 	// need to map our nonce values into mod n scalars so we can work with
 	// the btcec API.
@@ -348,25 +348,25 @@ func AggregateNonces(pubNonces [][PubNonceSize]byte) ([PubNonceSize]byte,
 	// function to extra 33 bytes at a time from the packed 2x public
 	// nonces.
 	type nonceSlicer func([PubNonceSize]byte) []byte
-	combineNonces := func(slicer nonceSlicer) (ec.JacobianPoint, error) {
+	combineNonces := func(slicer nonceSlicer) (btcec.JacobianPoint, error) {
 		// Convert the set of nonces into jacobian coordinates we can
 		// use to accumulate them all into each other.
-		pubNonceJs := make([]*ec.JacobianPoint, len(pubNonces))
+		pubNonceJs := make([]*btcec.JacobianPoint, len(pubNonces))
 		for i, pubNonceBytes := range pubNonces {
 			// Using the slicer, extract just the bytes we need to
 			// decode.
-			var nonceJ ec.JacobianPoint
-			nonceJ, err := ec.ParseJacobian(slicer(pubNonceBytes))
+			var nonceJ btcec.JacobianPoint
+			nonceJ, err := btcec.ParseJacobian(slicer(pubNonceBytes))
 			if err != nil {
-				return ec.JacobianPoint{}, err
+				return btcec.JacobianPoint{}, err
 			}
 			pubNonceJs[i] = &nonceJ
 		}
 		// Now that we have the set of complete nonces, we'll aggregate
 		// them: R = R_i + R_i+1 + ... + R_i+n.
-		var aggregateNonce ec.JacobianPoint
+		var aggregateNonce btcec.JacobianPoint
 		for _, pubNonceJ := range pubNonceJs {
-			ec.AddNonConst(
+			btcec.AddNonConst(
 				&aggregateNonce, pubNonceJ, &aggregateNonce,
 			)
 		}
@@ -378,21 +378,21 @@ func AggregateNonces(pubNonces [][PubNonceSize]byte) ([PubNonceSize]byte,
 	// aggregates the second nonce of all the parties.
 	var finalNonce [PubNonceSize]byte
 	combinedNonce1, err := combineNonces(func(n [PubNonceSize]byte) []byte {
-		return n[:ec.PubKeyBytesLenCompressed]
+		return n[:btcec.PubKeyBytesLenCompressed]
 	})
 	if err != nil {
 		return finalNonce, err
 	}
 	combinedNonce2, err := combineNonces(func(n [PubNonceSize]byte) []byte {
-		return n[ec.PubKeyBytesLenCompressed:]
+		return n[btcec.PubKeyBytesLenCompressed:]
 	})
 	if err != nil {
 		return finalNonce, err
 	}
-	copy(finalNonce[:], ec.JacobianToByteSlice(combinedNonce1))
+	copy(finalNonce[:], btcec.JacobianToByteSlice(combinedNonce1))
 	copy(
-		finalNonce[ec.PubKeyBytesLenCompressed:],
-		ec.JacobianToByteSlice(combinedNonce2),
+		finalNonce[btcec.PubKeyBytesLenCompressed:],
+		btcec.JacobianToByteSlice(combinedNonce2),
 	)
 	return finalNonce, nil
 }
