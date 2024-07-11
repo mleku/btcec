@@ -12,9 +12,9 @@ import (
 	"testing/quick"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/mleku/nodl/pkg/ec"
-	"github.com/mleku/nodl/pkg/ec/secp256k1"
-	"github.com/mleku/nodl/pkg/hex"
+	"github.com/mleku/btcec"
+	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/secp256k1"
 )
 
 type bip340Test struct {

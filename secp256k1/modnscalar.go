@@ -7,7 +7,7 @@ package secp256k1
 import (
 	"math/big"
 
-	"github.com/mleku/nodl/pkg/hex"
+	"github.com/mleku/btcec/hex"
 )
 
 // References:

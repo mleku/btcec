@@ -5,7 +5,7 @@
 package ec
 
 import (
-	"github.com/mleku/nodl/pkg/ec/secp256k1"
+	"github.com/mleku/btcec/secp256k1"
 )
 
 // SecretKey wraps an ecdsa.SecretKey as a convenience mainly for signing

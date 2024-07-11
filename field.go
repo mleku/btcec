@@ -1,6 +1,6 @@
 package ec
 
-import "github.com/mleku/nodl/pkg/ec/secp256k1"
+import "github.com/mleku/btcec/secp256k1"
 
 // FieldVal implements optimized fixed-precision arithmetic over the secp256k1
 // finite field. This means all arithmetic is performed modulo

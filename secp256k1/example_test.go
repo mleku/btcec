@@ -12,8 +12,8 @@ import (
 	"fmt"
 
 	"github.com/minio/sha256-simd"
-	"github.com/mleku/nodl/pkg/ec/secp256k1"
-	"github.com/mleku/nodl/pkg/hex"
+	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/secp256k1"
 )
 
 // This example demonstrates use of GenerateSharedSecret to encrypt a message

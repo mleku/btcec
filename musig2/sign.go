@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/mleku/nodl/pkg/ec"
-	"github.com/mleku/nodl/pkg/ec/chainhash"
-	"github.com/mleku/nodl/pkg/ec/schnorr"
-	"github.com/mleku/nodl/pkg/ec/secp256k1"
+	"github.com/mleku/btcec"
+	"github.com/mleku/btcec/chainhash"
+	"github.com/mleku/btcec/schnorr"
+	"github.com/mleku/btcec/secp256k1"
 )
 
 var (

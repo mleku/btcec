@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mleku/nodl/pkg/hex"
+	"github.com/mleku/btcec/hex"
 )
 
 // SetHex interprets the provided hex string as a 256-bit big-endian unsigned

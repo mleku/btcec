@@ -8,7 +8,7 @@ package ecdsa
 import (
 	"fmt"
 
-	"github.com/mleku/nodl/pkg/ec/secp256k1"
+	"github.com/mleku/btcec/secp256k1"
 )
 
 // References:

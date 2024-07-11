@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"os"
 
-	"github.com/mleku/nodl/pkg/lol"
+	"github.com/mleku/btcec/lol"
 )
 
 type (

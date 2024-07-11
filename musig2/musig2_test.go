@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/minio/sha256-simd"
-	"github.com/mleku/nodl/pkg/ec"
-	"github.com/mleku/nodl/pkg/hex"
+	"github.com/mleku/btcec"
+	"github.com/mleku/btcec/hex"
 )
 
 const (

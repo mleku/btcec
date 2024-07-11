@@ -4,7 +4,7 @@
 package ec
 
 import (
-	"github.com/mleku/nodl/pkg/ec/secp256k1"
+	"github.com/mleku/btcec/secp256k1"
 )
 
 // Error identifies an error related to public key cryptography using a

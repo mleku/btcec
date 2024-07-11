@@ -11,7 +11,7 @@ package ec
 import (
 	"testing"
 
-	"github.com/mleku/nodl/pkg/hex"
+	"github.com/mleku/btcec/hex"
 )
 
 func FuzzParsePubKey(f *testing.F) {

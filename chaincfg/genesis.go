@@ -3,8 +3,8 @@ package chaincfg
 import (
 	"time"
 
-	"github.com/mleku/nodl/pkg/ec/chainhash"
-	"github.com/mleku/nodl/pkg/ec/wire"
+	"github.com/mleku/btcec/chainhash"
+	"github.com/mleku/btcec/wire"
 )
 
 var (

@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/mleku/nodl/pkg/ec"
-	"github.com/mleku/nodl/pkg/ec/schnorr"
-	"github.com/mleku/nodl/pkg/hex"
+	"github.com/mleku/btcec"
+	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/schnorr"
 )
 
 var (
