@@ -5,8 +5,8 @@ package musig2
 import (
 	"fmt"
 
-	"github.com/mleku/btcec"
-	"github.com/mleku/btcec/schnorr"
+	"github.com/mleku/btcec/v2"
+	"github.com/mleku/btcec/v2/schnorr"
 )
 
 var (

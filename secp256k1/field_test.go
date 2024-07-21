@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/v2/hex"
 )
 
 // SetHex decodes the passed big-endian hex string into the internal field value

@@ -9,7 +9,7 @@ import (
 	"path"
 	"testing"
 
-	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/v2/hex"
 	"github.com/stretchr/testify/require"
 )
 

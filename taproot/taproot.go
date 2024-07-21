@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	bech322 "github.com/mleku/btcec/bech32"
-	"github.com/mleku/btcec/chaincfg"
+	bech322 "github.com/mleku/btcec/v2/bech32"
+	"github.com/mleku/btcec/v2/chaincfg"
 )
 
 // AddressSegWit is the base address type for all SegWit addresses.

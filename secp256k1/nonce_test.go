@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/minio/sha256-simd"
-	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/v2/hex"
 )
 
 // hexToBytes converts the passed hex string into bytes and will panic if there

@@ -8,7 +8,7 @@ package secp256k1
 import (
 	"math/bits"
 
-	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/v2/hex"
 )
 
 // References:

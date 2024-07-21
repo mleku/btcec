@@ -7,10 +7,10 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/mleku/btcec"
-	"github.com/mleku/btcec/chainhash"
-	"github.com/mleku/btcec/schnorr"
-	"github.com/mleku/btcec/secp256k1"
+	"github.com/mleku/btcec/v2"
+	"github.com/mleku/btcec/v2/chainhash"
+	"github.com/mleku/btcec/v2/schnorr"
+	"github.com/mleku/btcec/v2/secp256k1"
 )
 
 var (

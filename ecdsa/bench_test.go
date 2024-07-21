@@ -8,8 +8,8 @@ package ecdsa
 import (
 	"testing"
 
-	"github.com/mleku/btcec/hex"
-	"github.com/mleku/btcec/secp256k1"
+	"github.com/mleku/btcec/v2/hex"
+	"github.com/mleku/btcec/v2/secp256k1"
 )
 
 // hexToModNScalar converts the passed hex string into a ModNScalar and will

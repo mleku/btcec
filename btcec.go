@@ -20,7 +20,7 @@ package btcec
 // reverse the transform than to operate in affine coordinates.
 
 import (
-	"github.com/mleku/btcec/secp256k1"
+	"github.com/mleku/btcec/v2/secp256k1"
 )
 
 // KoblitzCurve provides an implementation for secp256k1 that fits the ECC

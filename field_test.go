@@ -9,7 +9,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/v2/hex"
 )
 
 // TestIsZero ensures that checking if a field IsZero works as expected.

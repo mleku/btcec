@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"github.com/minio/sha256-simd"
-	"github.com/mleku/btcec/hex"
+	"github.com/mleku/btcec/v2/hex"
 )
 
 const (

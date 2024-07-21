@@ -1,7 +1,7 @@
 package wire
 
 import (
-	"github.com/mleku/btcec/chainhash"
+	"github.com/mleku/btcec/v2/chainhash"
 )
 
 // OutPoint defines a bitcoin data type that is used to track previous

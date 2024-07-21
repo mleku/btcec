@@ -9,9 +9,9 @@ import (
 	"errors"
 	"io"
 
-	"github.com/mleku/btcec"
-	"github.com/mleku/btcec/chainhash"
-	"github.com/mleku/btcec/schnorr"
+	"github.com/mleku/btcec/v2"
+	"github.com/mleku/btcec/v2/chainhash"
+	"github.com/mleku/btcec/v2/schnorr"
 )
 
 const (

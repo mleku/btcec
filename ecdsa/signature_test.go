@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mleku/btcec/hex"
-	"github.com/mleku/btcec/secp256k1"
+	"github.com/mleku/btcec/v2/hex"
+	"github.com/mleku/btcec/v2/secp256k1"
 )
 
 // hexToBytes converts the passed hex string into bytes and will panic if there

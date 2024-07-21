@@ -5,7 +5,7 @@
 package btcec
 
 import (
-	"github.com/mleku/btcec/secp256k1"
+	"github.com/mleku/btcec/v2/secp256k1"
 )
 
 // SecretKey wraps an ecdsa.SecretKey as a convenience mainly for signing

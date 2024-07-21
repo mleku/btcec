@@ -14,7 +14,7 @@ import (
 	"math/big"
 	"os"
 
-	"github.com/mleku/btcec/secp256k1"
+	"github.com/mleku/btcec/v2/secp256k1"
 )
 
 // curveParams houses the secp256k1 curve parameters for convenient access.

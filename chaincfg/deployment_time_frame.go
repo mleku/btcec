@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mleku/btcec/wire"
+	"github.com/mleku/btcec/v2/wire"
 )
 
 var (
