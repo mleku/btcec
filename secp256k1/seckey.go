@@ -17,12 +17,17 @@ type SecretKey struct {
 	Key ModNScalar
 }
 
+// PrivateKey is a secret key.
+//
+// Deprecated: use SecretKey - secret = one person; private = two or more (you don't share secret keys!)
 type PrivateKey = SecretKey
 
-// NewSecretKey instantiates a new secret key from a scalar encoded as a
-// big integer.
+// NewSecretKey instantiates a new secret key from a scalar encoded as a big integer.
 func NewSecretKey(key *ModNScalar) *SecretKey { return &SecretKey{Key: *key} }
 
+// NewPrivateKey instantiates a new secret key from a scalar encoded as a big integer.
+//
+// Deprecated: use NewSecretKey - secret = one person; private = two or more (you don't share secret keys!)
 var NewPrivateKey = NewSecretKey
 
 // SecKeyFromBytes returns a secret based on the provided byte slice which is
@@ -72,22 +77,30 @@ func generateSecretKey(rand io.Reader) (*SecretKey, error) {
 	return &key, nil
 }
 
-// GenerateSecretKey generates and returns a new cryptographically secure
-// secret key that is suitable for use with secp256k1.
+// GenerateSecretKey generates and returns a new cryptographically secure secret key that is suitable for use with
+// secp256k1.
 func GenerateSecretKey() (*SecretKey, error) {
 	return generateSecretKey(rand.Reader)
 }
 
+// GeneratePrivateKey generates and returns a new cryptographically secure secret key that is suitable for use with
+// secp256k1.
+//
+// Deprecated: use NewSecretKey - secret = one person; private = two or more (you don't share secret keys!)
 var GeneratePrivateKey = GenerateSecretKey
 
-// GenerateSecretKeyFromRand generates a secret key that is suitable for use
-// with secp256k1 using the provided reader as a source of entropy.  The
-// provided reader must be a source of cryptographically secure randomness, such
-// as [crypto/rand.Reader], to avoid weak secret keys.
+// GenerateSecretKeyFromRand generates a secret key that is suitable for use with secp256k1 using the provided reader as
+// a source of entropy. The provided reader must be a source of cryptographically secure randomness, such as
+// [crypto/rand.Reader], to avoid weak secret keys.
 func GenerateSecretKeyFromRand(rand io.Reader) (*SecretKey, error) {
 	return generateSecretKey(rand)
 }
 
+// GeneratePrivateKeyFromRand generates a secret key that is suitable for use with secp256k1 using the provided reader as
+// a source of entropy. The provided reader must be a source of cryptographically secure randomness, such as
+// [crypto/rand.Reader], to avoid weak secret keys.
+//
+// Deprecated: use GenerateSecretKeyFromRand - secret = one person; private = two or more (you don't share secret keys!)
 var GeneratePrivateKeyFromRand = GenerateSecretKeyFromRand
 
 // PubKey computes and returns the public key corresponding to this secret key.

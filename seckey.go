@@ -8,10 +8,14 @@ import (
 	"ec.mleku.dev/v2/secp256k1"
 )
 
-// SecretKey wraps an ecdsa.SecretKey as a convenience mainly for signing
-// things with the secret key without having to directly import the ecdsa
-// package.
+// SecretKey wraps an ecdsa.SecretKey as a convenience mainly for signing things with the secret key without having to
+// directly import the ecdsa package.
 type SecretKey = secp256k1.SecretKey
+
+// PrivateKey wraps an ecdsa.SecretKey as a convenience mainly for signing things with the secret key without having to
+// directly import the ecdsa package.
+//
+// Deprecated: use SecretKey - secret = one person; private = two or more (you don't share secret keys!)
 type PrivateKey = SecretKey
 
 // SecKeyFromBytes returns a secret and public key for `curve' based on the
@@ -23,10 +27,12 @@ func SecKeyFromBytes(pk []byte) (*SecretKey, *PublicKey) {
 
 var PrivKeyFromBytes = SecKeyFromBytes
 
-// NewSecretKey is a wrapper for ecdsa.GenerateKey that returns a SecretKey
-// instead of the normal ecdsa.PrivateKey.
+// NewSecretKey is a wrapper for ecdsa.GenerateKey that returns a SecretKey instead of the normal ecdsa.PrivateKey.
 func NewSecretKey() (*SecretKey, error) { return secp256k1.GenerateSecretKey() }
 
+// NewPrivateKey is a wrapper for ecdsa.GenerateKey that returns a SecretKey instead of the normal ecdsa.PrivateKey.
+//
+// Deprecated: use SecretKey - secret = one person; private = two or more (you don't share secret keys!)
 var NewPrivateKey = NewSecretKey
 
 // SecKeyFromScalar instantiates a new secret key from a scalar encoded as a
