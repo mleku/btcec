@@ -8,9 +8,9 @@ import (
 	"sync"
 	"testing"
 
+	"ec.mleku.dev/v2"
+	"ec.mleku.dev/v2/hex"
 	"github.com/minio/sha256-simd"
-	"github.com/mleku/btcec/v2"
-	"github.com/mleku/btcec/v2/hex"
 )
 
 const (

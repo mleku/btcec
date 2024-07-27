@@ -5,7 +5,7 @@
 package btcec
 
 import (
-	"github.com/mleku/btcec/v2/secp256k1"
+	"ec.mleku.dev/v2/secp256k1"
 )
 
 // These constants define the lengths of serialized public keys.

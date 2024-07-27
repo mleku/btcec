@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/mleku/btcec/v2/base58"
+	"ec.mleku.dev/v2/base58"
 )
 
 var (

@@ -7,7 +7,7 @@ package base58_test
 import (
 	"fmt"
 
-	"github.com/mleku/btcec/v2/base58"
+	"ec.mleku.dev/v2/base58"
 )
 
 // This example demonstrates how to decode modified base58 encoded data.

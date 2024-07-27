@@ -1,4 +1,4 @@
-module github.com/mleku/btcec/v2
+module ec.mleku.dev/v2
 
 go 1.22.5
 

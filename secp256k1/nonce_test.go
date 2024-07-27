@@ -8,8 +8,8 @@ package secp256k1
 import (
 	"testing"
 
+	"ec.mleku.dev/v2/hex"
 	"github.com/minio/sha256-simd"
-	"github.com/mleku/btcec/v2/hex"
 )
 
 // hexToBytes converts the passed hex string into bytes and will panic if there

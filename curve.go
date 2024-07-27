@@ -6,7 +6,7 @@ package btcec
 import (
 	"fmt"
 
-	"github.com/mleku/btcec/v2/secp256k1"
+	"ec.mleku.dev/v2/secp256k1"
 )
 
 // JacobianPoint is an element of the group formed by the secp256k1 curve in

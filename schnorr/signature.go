@@ -5,9 +5,9 @@ package schnorr
 import (
 	"fmt"
 
-	"github.com/mleku/btcec/v2"
-	"github.com/mleku/btcec/v2/chainhash"
-	"github.com/mleku/btcec/v2/secp256k1"
+	"ec.mleku.dev/v2"
+	"ec.mleku.dev/v2/chainhash"
+	"ec.mleku.dev/v2/secp256k1"
 )
 
 const (
