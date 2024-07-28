@@ -15,9 +15,8 @@ This includes the old style compact secp256k1 ECDSA signatures, that recover the
 public key rather than take a key as a parameter as used in Bitcoin
 transactions, the new style Schnorr signatures, and the Musig2 implementation.
 
-BIP 340 Schnorr signatures are implemented except for the nonstandard message
-length
-tests, that nobody uses anyway.
+BIP 340 Schnorr signatures are implemented including the variable length 
+message signing with the extra test vectors present and passing.
 
 The remainder of this document is from the original README.md.
 
