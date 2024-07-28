@@ -1,4 +1,4 @@
-mleku.online/git/ec
+ec.mleku.dev
 =====
 
 This is a full drop-in replacement for
@@ -27,15 +27,14 @@ Package `ec` implements elliptic curve cryptography needed for working with
 Bitcoin. It is designed so that it may be used with the standard
 crypto/ecdsa packages provided with Go.
 
-A comprehensive suite of testis provided to ensure proper functionality.
+A comprehensive suite of test is provided to ensure proper functionality.
 
 Package btcec was originally based on work from ThePiachu which is licensed
-under
-the same terms as Go, but it has signficantly diverged since then. The btcsuite
-developers original is licensed under the liberal ISC license.
+underthe same terms as Go, but it has signficantly diverged since then. The 
+btcsuite developers original is licensed under the liberal ISC license.
 
 ## Installation and Updating
 
 ```bash
-$ go install -u -v mleku.online/git/ec
+$ go get ec.mleku.dev@latest
 ```
